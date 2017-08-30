@@ -3,26 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //複数の弾丸で構成されたデッキ。
+[System.Serializable]
 public class BulletsDeck {
-    //弾丸の配列。
-    private BulletInfo[] _Bullets;
-    public BulletInfo[] bullets { get { return _Bullets; } }
-
-    private const int _BulletNum = 40;
-    public int bulletNum { get { return _BulletNum; } }
-
-    public BulletsDeck()
+    //弾丸のIDの配列。
+    [SerializeField]
+    private int[] _Bullets;
+    public int[] bullets
     {
-        //配列をサイズ分確保しただけ。
-        _Bullets = new BulletInfo[_BulletNum];        
-    }
-
-    public void Initialize()
-    {
-        //コンストラクタを呼んで初期化。
-        for (int i = 0; i < _BulletNum; i++)
+        get
         {
-            _Bullets[i] = new BulletInfo(0);
+            if(_Bullets == null)
+            {
+                //配列をサイズ分確保。
+                _Bullets = new int[_BulletNum];
+                for(int i = 0; i < _BulletNum; i++)
+                {
+                    _Bullets[i] = -1;
+                }
+            }
+            return _Bullets;
         }
     }
+    [SerializeField]
+    private const int _BulletNum = 40;
+    public int bulletNum { get { return _BulletNum; } }
 }

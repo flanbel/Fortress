@@ -5,6 +5,17 @@ using UnityEditor;
 
 public class Create : Editor
 {
+    //ファイルパスを取得。
+    private static string GetFilePath()
+    {
+        //フルパス取得。
+        string fullPath = EditorUtility.OpenFilePanel("開くファイルを指定してください。", "", "json");
+
+        //Assets より前のパスを無視。
+        int idx = fullPath.IndexOf("Assets");
+        return fullPath.Substring(idx);
+    }
+
     //JSONファイルを読み込む。
     private static T LoadJSON<T>(string filePath)
     {      
@@ -15,37 +26,48 @@ public class Create : Editor
         return JsonUtility.FromJson<T>(textAssets.text);
     }
 
+    //アセットを作って保存するよ。
     private static void CreateAsset(Object asset,string filePath)
     {
         //拡張子を外す。
         string filename = filePath.Replace(".json", "");
         //ScriptedObjectのシリアライズを行ってUnityのアセット化。
-        AssetDatabase.CreateAsset(asset, filename + ".asset");
+        //「SO(ScriptedObjectの略)」は他の外部ファイルと名前を区別するための物。
+        AssetDatabase.CreateAsset(asset, filename + "SO" + ".asset");
         AssetDatabase.SaveAssets();
         //変更があったアセットをインポートしなおす。
         AssetDatabase.Refresh();
     }
 
+    //ScriptableObject作るよ。
+    private static void CreateScriptableObjectFromJSON<T>(TemplateSO<T> asset)
+    {
+        //ファイルパス取得。
+        string filePath = GetFilePath();
+        if (!(string.IsNullOrEmpty(filePath)))
+        {
+            //Jsonをデシリアライズ。
+            //ScriptableObjectを継承したクラスはデシリアライズできないので、
+            //中間クラスのJsonに代入するという、ワンクッションを挟む必要がある。
+            TemplateSO<T>.Json json = LoadJSON<TemplateSO<T>.Json>(filePath);
+
+            //配列を設定。
+            asset.array = json.array;
+
+            //アセット作成。
+            CreateAsset(asset, filePath);
+        }
+    }
+
     [MenuItem("Assets/CreateScriptableObject/BulletInfo")]
     static void BulletInfo()
     {
-        //フルパス取得。
-        string fullPath = EditorUtility.OpenFilePanel("開くファイルを指定してください。", "", "json");
-        //Assets より前のパスを無視。
-        int idx = fullPath.IndexOf("Assets");
-        string filePath = fullPath.Substring(idx);
-        //Jsonをデシリアライズ。
-        //ScriptableObjectを継承したクラスはデシリアライズできないので、
-        //中間クラスのJsonに代入するという、ワンクッションを挟む必要がある。
-        BulletInfoSO.Json json = LoadJSON<BulletInfoSO.Json>(filePath);
+        CreateScriptableObjectFromJSON(new BulletInfoSO());
+    }
 
-        //初期化する。
-        BulletInfoSO asset = new BulletInfoSO()
-        {
-            //中間クラスから本データへ値をコピー。
-            array = json.array
-        };
-        //アセット作成。
-        CreateAsset(asset, filePath);
+    [MenuItem("Assets/CreateScriptableObject/BulletRecipe")]
+    static void BulletRecipe()
+    {
+        CreateScriptableObjectFromJSON(new BulletRecipeSO());
     }
 }

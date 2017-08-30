@@ -33,7 +33,7 @@ public class Fortress : MonoBehaviour {
         //要塞の情報を設定。
         //TODO:メニュー画面でカスタマイズした内容を読み込む。
         _FortressInfo = new FortressInfo();
-        _FortressInfo.deck.Initialize();
+        _FortressInfo.deck = SaveData.GetClass("BulletsDeck_0", new BulletsDeck());
 
         //体力テキスト検索。
         _HPText = GameObject.Find(name + "HPText").GetComponent<Text>();

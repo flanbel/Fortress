@@ -14,7 +14,7 @@ public class FortressInfo
     public int HP { get { return _HP; } set { _HP = Mathf.Max(0, value); } }
 
     private BulletsDeck _Deck;
-    public BulletsDeck deck { get { return _Deck; } }
+    public BulletsDeck deck { get { return _Deck; } set { _Deck = value; } }
 
     public FortressInfo()
     {

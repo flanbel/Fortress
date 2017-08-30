@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletInfoSO : ScriptableObject
+public class BulletInfoSO : TemplateSO<BulletInfo>
 {
-    //JSON用中間クラス
-    public class Json
-    {
-        public BulletInfo[] array;
-    }
-    public BulletInfo[] array;
+    
 }

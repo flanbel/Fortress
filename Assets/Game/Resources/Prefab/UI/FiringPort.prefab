@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 222400576532021438}
   - component: {fileID: 114423892869459248}
   m_Layer: 5
-  m_Name: Dummy
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 222316516642433120}
   - component: {fileID: 114397774071710802}
   - component: {fileID: 114324269629819424}
+  - component: {fileID: 114474289685729224}
   m_Layer: 5
   m_Name: FiringPort
   m_TagString: Untagged
@@ -58,6 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Cannon: {fileID: 0}
+  _Firing: {fileID: 0}
 --- !u!114 &114397774071710802
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -112,6 +114,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114474289685729224
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1953119434137588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25a3a463c08a0064b976c3bae3c45b1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &222316516642433120
 CanvasRenderer:
   m_ObjectHideFlags: 1

@@ -79,7 +79,7 @@ public class Supplement : MonoBehaviour {
             idx = Random.Range(0, _BulletNum);
         } while (_Supplied[idx] == true);
 
-        if(_Fortress.AddAmmo(_Fortress.fortressInfo.deck.bullets[idx]))
+        if(_Fortress.AddAmmo(Data.GetBulletInfo(_Fortress.fortressInfo.deck.bullets[idx])))
         {
             Supplied(idx);
         }

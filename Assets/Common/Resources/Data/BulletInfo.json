@@ -1,4 +1,12 @@
 ﻿{"array":
 [
-{"ID":0,"Power":1,"Speed":1,"Endurance":1,"Icon":0,"Texture":0}
-]}
+{"ID":0,"Name":"まんまる岩","Power":1,"Speed":5,"Endurance":1},
+{"ID":1,"Name":"木の実","Power":1,"Speed":5,"Endurance":1},
+{"ID":2,"Name":"木の矢","Power":3,"Speed":6,"Endurance":1},
+{"ID":3,"Name":"鉄の矢","Power":12,"Speed":8,"Endurance":1},
+{"ID":4,"Name":"金の矢","Power":30,"Speed":10,"Endurance":4},
+{"ID":5,"Name":"鉄球","Power":20,"Speed":4,"Endurance":1},
+{"ID":6,"Name":"とげ鉄球","Power":60,"Speed":3,"Endurance":1},
+{"ID":7,"Name":"大とげ鉄球","Power":150,"Speed":1,"Endurance":1},
+{"ID":8,"Name":"ミサイル","Power":1,"Speed":5,"Endurance":1},
+{"ID":9,"Name":"ロケット","Power":1,"Speed":5,"Endurance":1}]}
