@@ -9,28 +9,54 @@ public class DragObject : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     //元の画像。
     [SerializeField]
     private Image _SourceImage;
-    public Image sourceImage { get { return _SourceImage; } }
+    public Image sourceImage
+    {
+        get
+        {
+            if (_SourceImage == null)
+            {
+                _SourceImage = GetComponent<Image>();
+            }
+            return _SourceImage;
+        }
+    }
     //ドラッグする画像。
     static Image _DragImage;
     //ドラッグ時に表示するオブジェクト。
     static GameObject _DragObject;
-
-    // Use this for initialization
-    void Start()
+    private GameObject dragObject
     {
-        if (_SourceImage == null)
-            _SourceImage = GetComponent<Image>();
-
-        if (_DragObject == null)
+        get
         {
-            CreateDragObject();
+            if (_DragObject == null)
+            {
+                CreateDragObject();
+            }
+            return _DragObject;
         }
     }
+
+    RectTransform _CanvasRect;
+    //自分が所属しているキャンバス。
+    Canvas _ParentCanvas;
+    Canvas canvas
+    {
+        get
+        {
+            if (_ParentCanvas == null)
+            {
+                _ParentCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+                _CanvasRect = _ParentCanvas.GetComponent<RectTransform>();
+;            }
+            return _ParentCanvas;
+        }
+    }
+
     //ドラッグオブジェクト作成。
     public void CreateDragObject()
     {
         _DragObject = new GameObject("Dragging Object");
-        _DragObject.transform.SetParent(GameObject.Find("Canvas").transform);
+        _DragObject.transform.SetParent(canvas.transform,false);
         _DragObject.transform.SetAsLastSibling();
         _DragObject.transform.localScale = Vector3.one;
 
@@ -46,14 +72,14 @@ public class DragObject : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     // ドラッグオブジェクト設定。
     private void SetDragObject()
     {
-        _DragObject.SetActive(true);
+        dragObject.SetActive(true);
         //情報をコピー。
-        _DragImage.sprite = _SourceImage.sprite;
-        _DragImage.rectTransform.sizeDelta = _SourceImage.rectTransform.sizeDelta;
-        _DragImage.color = _SourceImage.color;
-        _DragImage.material = _SourceImage.material;
+        _DragImage.sprite = sourceImage.sprite;
+        _DragImage.rectTransform.sizeDelta = sourceImage.rectTransform.sizeDelta;
+        _DragImage.color = sourceImage.color;
+        _DragImage.material = sourceImage.material;
 
-        _SourceImage.color = Vector4.one * 0.6f;
+        sourceImage.color = Vector4.one * 0.6f;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -63,7 +89,23 @@ public class DragObject : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnDrag(PointerEventData eventData)
     {
-        _DragObject.transform.position = Input.mousePosition;
+        //マウスに追従させる。
+        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+        {
+            //マウスのポジションそのまま。
+            dragObject.transform.position = Input.mousePosition;
+        }
+        else
+        {
+            //
+            Vector3 screenPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+
+            Vector2 WorldObject_ScreenPosition = new Vector2(
+      ((screenPos.x * _CanvasRect.sizeDelta.x) - (_CanvasRect.sizeDelta.x * 0.5f)),
+      ((screenPos.y * _CanvasRect.sizeDelta.y) - (_CanvasRect.sizeDelta.y * 0.5f)));
+
+            dragObject.GetComponent<RectTransform>().anchoredPosition = WorldObject_ScreenPosition;
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -74,13 +116,12 @@ public class DragObject : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     //ドラッグ終了時に呼び出される処理。
     public void EndDrag()
     {
-        _SourceImage.color = Color.white;
-        _DragObject.SetActive(false);
+        sourceImage.color = Color.white;
+        dragObject.SetActive(false);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
-        if (_DragObject)
-            _DragObject.SetActive(false);
+        EndDrag();
     }
 }

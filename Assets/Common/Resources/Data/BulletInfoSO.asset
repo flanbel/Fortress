@@ -17,48 +17,58 @@ MonoBehaviour:
     Power: 1
     Speed: 5
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 1
     Name: "\u6728\u306E\u5B9F"
     Power: 1
     Speed: 5
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 2
     Name: "\u6728\u306E\u77E2"
     Power: 3
     Speed: 6
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 3
     Name: "\u9244\u306E\u77E2"
     Power: 12
     Speed: 8
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 4
     Name: "\u91D1\u306E\u77E2"
     Power: 30
     Speed: 10
     Endurance: 4
+    _Icon: {fileID: 0}
   - ID: 5
     Name: "\u9244\u7403"
     Power: 20
     Speed: 4
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 6
     Name: "\u3068\u3052\u9244\u7403"
     Power: 60
     Speed: 3
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 7
     Name: "\u5927\u3068\u3052\u9244\u7403"
     Power: 150
     Speed: 1
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 8
     Name: "\u30DF\u30B5\u30A4\u30EB"
     Power: 1
     Speed: 5
     Endurance: 1
+    _Icon: {fileID: 0}
   - ID: 9
     Name: "\u30ED\u30B1\u30C3\u30C8"
     Power: 1
     Speed: 5
     Endurance: 1
+    _Icon: {fileID: 0}

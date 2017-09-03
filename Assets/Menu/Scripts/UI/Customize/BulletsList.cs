@@ -11,7 +11,7 @@ public class BulletsList : MonoBehaviour {
 
     private void Start()
     {
-        _BulletItemPrefab = Resources.Load("Prefab/UI/BulletItem") as GameObject;
+        _BulletItemPrefab = Resources.Load("Prefab/UI/Custom/BulletItem") as GameObject;
 
         //リストのアイテム生成方法を設定。
         _CustomList = GetComponent<CustomList>();

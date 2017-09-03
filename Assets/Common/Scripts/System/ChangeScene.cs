@@ -14,8 +14,15 @@ public class ChangeScene : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            _Audio.Play();
-            FadeManager.Instance.LoadScene(_SceneName,2.0f);
+            Change();
         }
 	}
+
+    public void Change()
+    {
+        if (_Audio)
+            _Audio.Play();
+        //シーン切り替え。
+        FadeManager.Instance.LoadScene(_SceneName, 3.0f);
+    }
 }

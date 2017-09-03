@@ -2,20 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//ゲームシーンで発射する弾丸。
 public class Bullet : MonoBehaviour {
+
+    SpriteRenderer _Sprite;
+    SpriteRenderer sprite
+    {
+        get
+        {
+            if(_Sprite == null)
+            {
+                _Sprite = GetComponent<SpriteRenderer>();
+            }
+            return _Sprite;
+        }
+    }
+
     //弾丸の情報。
     [SerializeField]
     private BulletInfo _BulletInfo;
-    public BulletInfo bulletInfo { get { return _BulletInfo; } set { _BulletInfo = value; } }
-    
-    // Use this for initialization
-    void Start () {
-
+    public BulletInfo bulletInfo
+    {
+        get { return _BulletInfo; }
+        set
+        {
+            //値をコピーする
+            _BulletInfo.CopyInfo(value);
+            sprite.sprite = _BulletInfo.Texture;
+        }
     }
 	
 	// Update is called once per frame
 	void Update () {
+        //範囲外チェック。
         CheckLimit();
+        transform.Rotate(new Vector3(0, 0, 1));
     }
 
     //耐久値の減算。
@@ -31,17 +52,17 @@ public class Bullet : MonoBehaviour {
     //弾丸破壊。
     private void _Break()
     {
-        GameObject bom = Instantiate(Resources.Load("Prefab/Explosion")as GameObject);
+        GameObject bom = GameBulletsManager.Instance.Explosion();
         bom.transform.position = transform.position;
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     //範囲外に出た。
     private void CheckLimit()
     {
-        if (transform.position.x > 200 ||
+        if (transform.position.x > 1960 ||
             transform.position.y < -10)
-            Destroy(this.gameObject);
+            gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

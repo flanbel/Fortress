@@ -5,83 +5,73 @@ using UnityEngine;
 public class Supplement : MonoBehaviour {
 
     //要塞。
-    private Fortress _Fortress;
-
-    //補給間隔。
-    [SerializeField]
-    private float _Interval = 1.0f;
-    
+    private Fortress _Fortress;    
     //補給済みかどうか？
     private List<bool> _Supplied = new List<bool>();
     //弾丸の数。
-    private int _BulletNum = 0;
+    private int bulletNum { get { return _Fortress.Info.deck.bulletNum; } } 
 
 	// Use this for initialization
 	void Start () {
         //要塞取得。
         _Fortress = GetComponent<Fortress>();
 
-        //デッキに入っている弾丸の数。
-        _BulletNum = _Fortress.fortressInfo.deck.bulletNum;
-        for (int i = 0; i < _BulletNum; i++)
+        //補給確認リスト制作。
+        for (int i = 0; i < bulletNum; i++)
             _Supplied.Add(false);
 
-        StartCoroutine(Supply());
+        //補給開始。
+        StartCoroutine(Supplying());
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
-    //補給する。
-    public IEnumerator Supply()
+    //一定時間が毎に補給する。
+    public IEnumerator Supplying()
     {
         while (true)
         {
-            yield return new WaitForSeconds(_Interval);
+            //補給間隔分待つ。
+            yield return new WaitForSeconds(_Fortress.Info.param.SupplyInterval);
             //弾薬補給。
-            AmmunitionSupplement();
-        }
-    }
-
-    //補給済みにする。
-    private void Supplied(int idx)
-    {
-        _Supplied[idx] = true;
-        int count = 0;
-        for (;count < _BulletNum; count++)
-        {
-            //未補給を探す。
-            if (_Supplied[count] == false)
-                break;
-        }
-
-        //全て補給した。
-        if(count == _BulletNum)
-        {
-            //リセット。
-            for(int i = 0; i < _BulletNum; i++)
-            {
-                _Supplied[i] = false;
-            }
+            Supply();
         }
     }
 
     //弾薬補給。
-    public void AmmunitionSupplement()
+    public void Supply()
     {
+        //補給する弾薬の添え字。
         int idx = 0;
+        int count = 0;
         //未補給であった場合のみ補給。
-        do
+        while (_Supplied[idx = Random.Range(0, bulletNum)] == true)
         {
-            //補給する弾薬をランダムで決定。
-            idx = Random.Range(0, _BulletNum);
-        } while (_Supplied[idx] == true);
+            if (count++ > 1000)
+                break;
+        }
 
-        if(_Fortress.AddAmmo(Data.GetBulletInfo(_Fortress.fortressInfo.deck.bullets[idx])))
+        //デッキから要塞の弾薬庫へ補給する。
+        if (_Fortress.AddAmmo(_Fortress.Info.deck.bullets[idx]))
         {
+            //補給済みにする。
             Supplied(idx);
+        }
+    }
+
+    //補給済みにする。
+    //全てが補給済みならリセット。
+    private void Supplied(int idx)
+    {
+        //補給済みにする。
+        _Supplied[idx] = true;
+        
+        //全て補給し終えたか？
+        if(_Supplied.TrueForAll((a) => a == true))
+        {
+            //リセット。
+            for (int i=0;i<_Supplied.Count;i++)
+            {
+                _Supplied[i] = false;
+            }
         }
     }
 }

@@ -3,54 +3,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DisplayDamage : MonoBehaviour {
+public class DisplayDamage : SingletonMonoBehaviour<DisplayDamage> {
 
     //ダメージを表示するテキストのプレハブ。
     private GameObject _DisplayTextPrefab;
-
-    //インスタンス。
-    private static DisplayDamage _Instance;
-
-    public static DisplayDamage GetInstance()
+    private GameObject prefab
     {
-        if (_Instance == null)
+        get
         {
-            //生成。
-            GameObject obj = new GameObject("DisplayDamage");
-            obj.transform.SetParent(GameObject.Find("Canvas").transform);
-            obj.transform.SetAsLastSibling();
-            _Instance = obj.AddComponent<DisplayDamage>();
+            if (_DisplayTextPrefab == null)
+            {
+                _DisplayTextPrefab = Resources.Load("Prefab/UI/DamageText") as GameObject;
+            }
+            return _DisplayTextPrefab;
         }
-        return _Instance;
     }
+
+    private List<Text> _TextList = new List<Text>();
 
 	// Use this for initialization
-	void Awake () {
-		if(_Instance == null)
+	void Start () {
+        if (this != Instance)
         {
-            _Instance = this;
-        }
-        else
-        {
-            //削除？
             Destroy(this);
+            return;
         }
-	}
 
-    private void Start()
-    {
-        _DisplayTextPrefab = Resources.Load("Prefab/UI/DamageText")as GameObject;
+        for(int i = 0; i < 10; i++)
+        {
+            //生成。
+            GameObject damageT = Instantiate(prefab, transform);
+            _TextList.Add(damageT.GetComponent<Text>());
+            damageT.SetActive(false);
+        }
     }
 
-    public void CreateDamageText(int damage,Vector3 pos,string tag)
+    //ダメージテキストを表示。
+    //[in] 表示するダメージ。
+    //[in] 表示する場所の基点。
+    //[in] タグ。
+    public void DisplayDamageText(int damage,Vector3 pos,string tag)
     {
-        //生成。
-        GameObject TEXT = Instantiate(_DisplayTextPrefab,transform);
-        TEXT.tag = tag;
-        int range = 30;
-        TEXT.transform.position = Camera.main.WorldToScreenPoint(pos) + new Vector3(Random.Range(-range, range), Random.Range(-range, range));
-
-        Text TextC = TEXT.GetComponent<Text>();
-        TextC.text = damage.ToString();
+        //非アクティブなテキストを取得。
+        Text text = _TextList.Find((a) => a.gameObject.activeSelf == false);
+        text.gameObject.SetActive(true);
+        //タグ設定。
+        text.tag = tag;
+        //少しずらす。
+        int range = 100;
+        text.transform.position = pos + new Vector3(Random.Range(-range, range), Random.Range(-range, range));
+        //ダメージ設定。
+        text.text = damage.ToString();
     }
 }

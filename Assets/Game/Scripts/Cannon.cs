@@ -3,30 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Cannon : MonoBehaviour {
-    //要塞。
-    Fortress _Fortress;
-    //ベースとなる弾丸のプレハブ。
-    private GameObject _BulletBasePrefab;
-	// Use this for initialization
-	void Start () {
-        _Fortress = transform.parent.gameObject.GetComponent<Fortress>();
-        //プレハブの取得。
-        _BulletBasePrefab = Resources.Load("Prefab/BulletBase") as GameObject;
+    
+    //発射口。
+    [SerializeField]
+    private Transform _FiringPoint;
+    public Vector3 firingPos { get { return _FiringPoint.position; } }
+
+    public void Start()
+    {
+        _FiringPoint.gameObject.GetComponent<SpriteRenderer>().enabled = false;
     }
-	
-	// Update is called once per frame
-	void Update () {
-       
-	}
 
     //弾を発射。
     public void Shot(Firing firing,BulletInfo info)
     {
-        //弾薬を消費。
-        _Fortress.armory.Remove(info);
-
         //発射口に弾丸のインスタンスを生成。
-        GameObject obj = Instantiate(_BulletBasePrefab, firing.firingPoint.position, new Quaternion());
+        GameObject obj = GameBulletsManager.Instance.GetBullet();
+        obj.transform.position = _FiringPoint.position;
         //大砲と同じタグを設定。
         obj.tag = tag;
 

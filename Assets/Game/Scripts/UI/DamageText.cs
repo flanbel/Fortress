@@ -6,14 +6,31 @@ using UnityEngine.UI;
 
 public class DamageText : MonoBehaviour {
 
-    Animator _Animator;
+    private Animator _Animator;
+    private Animator animator
+    {
+        get
+        {
+            if (_Animator == null)
+            {
+                _Animator = GetComponent<Animator>();
+            }
+            return _Animator;
+        }
+    }
     Text _Text;
-    private bool _Move = false;
+    private bool _EndAnim = false;
 
     private void Start()
     {
-        _Animator = GetComponent<Animator>();
+        
         _Text = GetComponent<Text>();
+    }
+
+    private void OnEnable()
+    {
+        _EndAnim = false;
+        animator.Play("DamageText");
     }
 
     // Update is called once per frame
@@ -23,10 +40,11 @@ public class DamageText : MonoBehaviour {
 
     private void CheckEndAnimation()
     {
-        if (_Move == false &&
-           _Animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash("End Animation"))
+        if (gameObject.activeSelf &&
+            _EndAnim == false &&
+           animator.GetCurrentAnimatorStateInfo(0).shortNameHash == Animator.StringToHash("End Animation"))
         {
-            _Move = true;
+            _EndAnim = true;
             StartCoroutine(Move());
         }
     }
@@ -45,20 +63,18 @@ public class DamageText : MonoBehaviour {
         GameObject _Target = GameObject.Find(tag + "HPText");
         Vector3 targetPos = _Target.transform.position;
 
-        while (true)
+        do
         {
-            timer += Time.deltaTime / 1.5f;
+            //時間加算。
+            timer = Mathf.Min(1.0f, timer + (Time.deltaTime / 1.5f));
+            //移動
             transform.position = Vector3.Slerp(startPos, targetPos, timer);
 
-            if(timer >= 1.0f)
-            {
-                ApplyDamage();
-                break;
-            }
-
             yield return new WaitForEndOfFrame();
-        }
-
-        Destroy(gameObject);
+        } while (timer < 1.0f);
+        //ダメージ適用。
+        ApplyDamage();
+        //非アクティブにする。
+        gameObject.SetActive(false);
     }
 }

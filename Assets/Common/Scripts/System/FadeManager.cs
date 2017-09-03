@@ -26,11 +26,7 @@ public class FadeManager : SingletonMonoBehaviour<FadeManager>
         //シーンをまたいでも破棄されないように。
         DontDestroyOnLoad(this.gameObject);
 
-        //ここで黒テクスチャ作る
-        this.blackTexture = new Texture2D(32, 32, TextureFormat.RGB24, false);
-        this.blackTexture.ReadPixels(new Rect(0, 0, 32, 32), 0, 0, false);
-        this.blackTexture.SetPixel(0, 0, Color.white);
-        this.blackTexture.Apply();
+        StartCoroutine(CreateTexture());
     }
 
     public void OnGUI()
@@ -41,6 +37,19 @@ public class FadeManager : SingletonMonoBehaviour<FadeManager>
         //透明度を更新して黒テクスチャを描画
         GUI.color = new Color(0, 0, 0, this.fadeAlpha);
         GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), this.blackTexture);
+    }
+
+    private IEnumerator CreateTexture()
+    {
+        //ここで黒テクスチャ作る
+        this.blackTexture = new Texture2D(32, 32, TextureFormat.RGB24, false);
+
+        //1フレーム待つ
+        yield return new WaitForEndOfFrame();
+        //キャプチャ？
+        this.blackTexture.ReadPixels(new Rect(0, 0, 32, 32), 0, 0, false);
+        this.blackTexture.SetPixel(0, 0, Color.white);
+        this.blackTexture.Apply();
     }
 
     /// <summary>

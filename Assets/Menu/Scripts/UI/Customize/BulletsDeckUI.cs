@@ -13,7 +13,7 @@ public class BulletsDeckUI : MonoBehaviour {
     void Start () {
 
         //Dropを受け取るＵＩ作成。
-        GameObject prefab = Resources.Load("Prefab/UI/DeckContent")as GameObject;
+        GameObject prefab = Resources.Load("Prefab/UI/Custom/DeckContent") as GameObject;
         for(int idx = 0; idx < Data.Deck.bulletNum; idx++)
         {
             GameObject content = Instantiate(prefab, transform);

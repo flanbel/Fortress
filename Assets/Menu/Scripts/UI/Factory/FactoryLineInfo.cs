@@ -25,5 +25,5 @@ public class FactoryLineInfo
     public bool repeat = false;
 
     //生産する弾丸のレシピ。
-    public BulletRecipe recipe = null;
+    public BulletRecipe recipe = new BulletRecipe();
 }

@@ -23,24 +23,19 @@ public class FactoryLine : MonoBehaviour {
         }
     }
 
-    //かかる時間。(分)
+    //生産にかかる時間。(分)
     private const int _TakeTime = 1;
 
     //ラインの情報。
     [SerializeField]
-    private FactoryLineInfo _LineInfo;
+    private FactoryLineInfo _LineInfo = new FactoryLineInfo();
     private FactoryLineInfo lineInfo
     {
         get
         {
-            if (_LineInfo == null || _LineInfo.state == FactoryLineInfo.LineState.Initial)
+            if (_LineInfo.state == FactoryLineInfo.LineState.Initial)
             {
                 _LineInfo = SaveData.GetClass("FactoryLine_" + lineID, new FactoryLineInfo());
-
-                if (_LineInfo == null)
-                {
-                    _LineInfo = new FactoryLineInfo();
-                }
 
                 if (_LineInfo.state == FactoryLineInfo.LineState.Initial)
                 {
@@ -54,11 +49,6 @@ public class FactoryLine : MonoBehaviour {
     private FactoryLineInfo.LineState state
     {
         get { return lineInfo.state; }
-        set
-        {
-            lineInfo.state = value;
-            SetTextGUI();
-        }
     }
 
     private int timer
@@ -77,9 +67,9 @@ public class FactoryLine : MonoBehaviour {
         set
         {
             lineInfo.recipe = value;
-            SetIcon();
-            SetButtonGUI();
             SetDisplayGUI();
+            SetIcon();
+            CheckExecutable();
         }
     }
 
@@ -95,37 +85,34 @@ public class FactoryLine : MonoBehaviour {
             }
             return _Coroutine;
         }
-        set
-        {
-            _Coroutine = value;
-        }
+        set { _Coroutine = value; }
     }
 
+    //ボタンが押された時に呼び出される関数。
+    delegate void ButtonFunction();
+    ButtonFunction _ButtonFunc = null;
+
+    //ラインを構成するUI。
     [SerializeField]
     Image _Gauge;
-
     [SerializeField]
     Text _DisplayText;
-
     [SerializeField]
     Text _ButtonText;
-
     [SerializeField]
     Image _Icon;
-
     [SerializeField]
     Button _Button;
-
     [SerializeField]
     Toggle _RepeatToggle;
-
+    
+    //アクティブになった。
     private void OnEnable()
     {
         //データ読み込み。
         LoadData();
     }
-
-    //非アクティブ。
+    //非アクティブになった。
     private void OnDisable()
     {
         SaveData.SetClass("FactoryLine_" + lineID, _LineInfo);
@@ -135,7 +122,7 @@ public class FactoryLine : MonoBehaviour {
 
     private void Update()
     {
-        //現在の時刻を保存。
+        //現在の時刻を設定。
         SaveData.SetString("LastTime", DateTime.Now.ToString());
     }
 
@@ -152,9 +139,9 @@ public class FactoryLine : MonoBehaviour {
         {
             //値の変更をGUIに適用。
             SetDisplayGUI();
-            SetTextGUI();
             SetIcon();
             SetButtonGUI();
+            CheckExecutable();
             _RepeatToggle.isOn = lineInfo.repeat;
 
             if (state == FactoryLineInfo.LineState.Generating)
@@ -176,6 +163,7 @@ public class FactoryLine : MonoBehaviour {
     //タイマー更新。
     private void SetDisplayGUI()
     {
+        //残り時間を取得。
         float time = _LineInfo.timer;
         //タイマー更新。
         if (time >= 0)
@@ -191,97 +179,114 @@ public class FactoryLine : MonoBehaviour {
             //ゲージ更新。
             _Gauge.fillAmount = 0.0f;
             BulletInfo info = recipe.bulletInfo;
-            _DisplayText.text = string.Format("名前：{0}\n生産コスト:{1}\n生産個数：{2:####}", info.Name, recipe.cost, recipe.generateNum);
+            if (info != null)
+            {
+                //情報表示。
+                _DisplayText.text = string.Format("名前：{0}\n" +
+                    "生産コスト:{1}\n" +
+                    "生産個数：{2:####}", info.Name, recipe.cost, recipe.generateNum);
+            }
+            else
+            {
+                //情報表示。
+                _DisplayText.text = "レシピが設定されていません。";
+            }
         }
     }
 
-    //テキスト更新。
-    private void SetTextGUI()
+    //ボタンに各ステートに対応した設定をセット。
+    private void SetButtonGUI()
     {
-        //
-        switch (lineInfo.state)
+        switch (state)
         {
             case FactoryLineInfo.LineState.Initial:
                 _ButtonText.text = "準備中";
                 break;
             case FactoryLineInfo.LineState.Idle:
                 _ButtonText.text = "ＯＫ";
+                //生産開始処理。
+                _ButtonFunc = InvokeLine;
                 break;
             case FactoryLineInfo.LineState.Generating:
                 _ButtonText.text = "キャンセル";
+                //生産中止処理。
+                _ButtonFunc = StopLine;
                 break;
             case FactoryLineInfo.LineState.Completed:
                 _ButtonText.text = "受け取る";
+                //弾丸受け取り。
+                _ButtonFunc = CompletedLine;
                 break;
         }
     }
 
-    //ボタン更新。
-    private void SetButtonGUI()
-    {
-        int mycost = 0;
-        //レシピが設定されていない　||
+    //実行可能かチェック。
+    private void CheckExecutable()
+    { 
         //存在しない弾丸。
-
-        _Button.interactable = (recipe != null && recipe.bulletInfo != null);
-        
-        //コスト比較。
+        _Button.interactable = (recipe.bulletInfo != null);
+        //(recipe.cost < 0)
     }
 
     //アイコン設定。
     private void SetIcon()
     {
-        _Icon.sprite = recipe.bulletInfo.Icon;
+        if (recipe.bulletInfo != null)
+            _Icon.sprite = recipe.bulletInfo.Icon;
     }
 
     //ボタンを押したときの処理。
     public void ButtonProcess()
     {
-        switch (state)
-        {
-            case FactoryLineInfo.LineState.Idle:
-                //開始処理。
-                InvokeLine();
-                break;
-            case FactoryLineInfo.LineState.Generating:
-                //キャンセル処理。
-                StopLine();
-                break;
-            case FactoryLineInfo.LineState.Completed:
-                //弾丸受け取り。
-                CompletedLine();
-                break;
-        }
+        _ButtonFunc();
     }
 
     //生産ライン起動。
     private void InvokeLine()
     {
-        state = FactoryLineInfo.LineState.Generating;
-        timer = _TakeTime * 60;
-        
-        //ストップで止めるためにコルーチン保持。
-        coroutine = TimerDecrease();
-        //新しいコルーチンを開始。
-        StartCoroutine(coroutine);
+        //ステート切り替え。
+        ChangeState(FactoryLineInfo.LineState.Generating);
     }
 
     //生産中止。
     private void StopLine()
     {
-        state = FactoryLineInfo.LineState.Idle;
-        timer = -1;
-        StopCoroutine(coroutine);
+        //ステート切り替え。
+        ChangeState(FactoryLineInfo.LineState.Idle);
     }
 
     //生産終了。
     private void CompletedLine()
     {
-        state = FactoryLineInfo.LineState.Idle;
-        timer = -1;
-        StopCoroutine(coroutine);
-        //弾丸を追加。
+        //ステート切り替え。
+        ChangeState(FactoryLineInfo.LineState.Idle);
+        //弾丸を補充。
         Data.AddBulletStock(recipe.bulletID, recipe.generateNum);
+    }
+
+    private void ChangeState(FactoryLineInfo.LineState next)
+    {
+        switch (next)
+        {
+            case FactoryLineInfo.LineState.Idle:
+                //タイマー初期化。
+                timer = -1;
+                StopCoroutine(coroutine);
+                break;
+            case FactoryLineInfo.LineState.Generating:
+                //タイマー設定。
+                timer = _TakeTime * 60;
+                //ストップで止めた後も再開できるようにコルーチン保持。
+                coroutine = TimerDecrease();
+                StartCoroutine(coroutine);
+                break;
+            case FactoryLineInfo.LineState.Completed:
+                timer = 0;
+                StopCoroutine(coroutine);
+                break;
+        }
+        lineInfo.state = next;
+        SetButtonGUI();
     }
 
     //時間を減らす。
@@ -289,7 +294,9 @@ public class FactoryLine : MonoBehaviour {
     {
         while (true)
         {
+            //1秒待つ。
             yield return new WaitForSecondsRealtime(1);
+            //1秒経過させる。
             PassageOfTime(1);
         }
     }
@@ -299,18 +306,14 @@ public class FactoryLine : MonoBehaviour {
     //[out] 完成したかどうか
     private bool PassageOfTime(int sub)
     {
-        if (state == FactoryLineInfo.LineState.Generating)
+        //0未満にならない。
+        timer = Mathf.Max(0, timer - sub);
+        
+        if (timer <= 0)
         {
-            //0未満にはならない。
-            timer = Mathf.Max(0, timer - sub);
-
-            //時間経過。
-            if (timer <= 0)
-            {
-                //完成。
-                state = FactoryLineInfo.LineState.Completed;
-                return true;
-            }
+            //完成。
+            ChangeState(FactoryLineInfo.LineState.Completed);
+            return true;
         }
         return false;
     }

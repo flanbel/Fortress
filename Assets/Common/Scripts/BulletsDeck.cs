@@ -24,6 +24,8 @@ public class BulletsDeck {
             return _Bullets;
         }
     }
+
+    //弾の最大数。
     [SerializeField]
     private const int _BulletNum = 40;
     public int bulletNum { get { return _BulletNum; } }

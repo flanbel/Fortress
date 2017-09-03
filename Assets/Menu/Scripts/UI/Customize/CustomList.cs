@@ -37,10 +37,10 @@ public class CustomList : MonoBehaviour {
 
     //ページを登録する親。
     [SerializeField]
-    private Transform _PageList; 
+    private RectTransform _PageList;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         //ページ数を切り上げ。
         _MaxPageNum = (int)Mathf.Ceil(_ItemNum / 8.0f);
         nowPage = 1;
@@ -52,13 +52,13 @@ public class CustomList : MonoBehaviour {
     //ページを生成する関数。
     private void CreatePage()
     {
-        GameObject PagePrefab = Resources.Load("Prefab/UI/CustomPage") as GameObject;
+        GameObject PagePrefab = Resources.Load("Prefab/UI/Custom/CustomPage") as GameObject;
 
         int Count = 0;
         //ページ分ループする。
         for (int i = 0; i < _MaxPageNum; i++)
         {
-            GameObject page = Instantiate(PagePrefab, _PageList);
+            GameObject page = Instantiate(PagePrefab, _PageList,false);
             page.name = "Page_" + (i + 1).ToString();
             //ページ内のアイテムを生成。
             for (int j = 0; (j < 8) && (Count < _ItemNum); j++, Count++)
@@ -74,6 +74,7 @@ public class CustomList : MonoBehaviour {
                 }
             }
         }
+        _PageList.sizeDelta = Vector2.one;
     }
 
     //ページ移動。
@@ -82,14 +83,17 @@ public class CustomList : MonoBehaviour {
         RectTransform rect = _PageList.gameObject.GetComponent<RectTransform>();
         Vector3 start = rect.anchoredPosition3D;
         float timer = 0.0f;
-        while ((timer += Time.deltaTime * 3) < 1.0f)
+        //1ページ分の幅。
+        float pageWidth = rect.sizeDelta.x / _MaxPageNum;
+        do
         {
-            rect.anchoredPosition3D = Vector3.Lerp(start, new Vector3(-rect.sizeDelta.x * (_NowPage - 1), start.y), timer);
-            
-            yield return new WaitForEndOfFrame();
-        }
+            //時間の加算。
+            timer = Mathf.Min(1.0f, (timer + Time.deltaTime * 3));
 
-        rect.anchoredPosition3D = Vector3.Lerp(start, new Vector3(-rect.sizeDelta.x * (_NowPage - 1), start.y), 1.0f);
+            rect.anchoredPosition3D = Vector3.Lerp(start, new Vector3(-pageWidth * (_NowPage - 1), start.y), timer);
+
+            yield return new WaitForEndOfFrame();
+        } while (timer < 1.0f);
     }
 
     //次のページへ。

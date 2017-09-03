@@ -7,12 +7,9 @@ using UnityEngine.UI;
 
 public class FiringPortUI : MonoBehaviour, IDropHandler
 {
-    //大砲。
+    //要塞。
     [SerializeField]
-    private Cannon _Cannon;
-    //発射。
-    [SerializeField]
-    private Firing _Firing;
+    private Fortress _Fortress;
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -21,10 +18,10 @@ public class FiringPortUI : MonoBehaviour, IDropHandler
             (ui = eventData.pointerDrag.GetComponent<BulletUI>()))
         {
             //弾を発射。
-            _Cannon.Shot(_Firing,ui.bulletInfo);
+            _Fortress.Shot(transform.GetSiblingIndex(), ui.bulletInfo);
             
-            //UI削除。
-            Destroy(eventData.pointerDrag);
+            //ドラッグUIを非アクティブにする。
+            eventData.pointerDrag.SetActive(false);
         }
     }
 }
