@@ -21,9 +21,9 @@ GameObject:
   - component: {fileID: 224700461015408104}
   - component: {fileID: 222120066136378742}
   - component: {fileID: 114668627975014108}
-  - component: {fileID: 114861452582551546}
   - component: {fileID: 95961901182941196}
-  - component: {fileID: 114338769070490716}
+  - component: {fileID: 114861452582551546}
+  - component: {fileID: 114443939830158574}
   m_Layer: 5
   m_Name: BulletUI
   m_TagString: Untagged
@@ -48,7 +48,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114338769070490716
+--- !u!114 &114443939830158574
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -56,9 +56,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 1879087698095806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1627df0a3863e64094bf971ad8527d2, type: 3}
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114861452582551546}
+          m_MethodName: OnClick
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114668627975014108
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -99,11 +118,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _BulletInfo:
     ID: 0
+    Name: unknown
     Power: 12
     Speed: 1
     Endurance: 1
-    Icon: {fileID: 0}
-    Texture: {fileID: 0}
+    _Icon: {fileID: 0}
 --- !u!222 &222120066136378742
 CanvasRenderer:
   m_ObjectHideFlags: 1

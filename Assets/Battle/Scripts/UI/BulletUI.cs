@@ -33,4 +33,26 @@ public class BulletUI : MonoBehaviour
             image.sprite = _BulletInfo.Icon;
         }
     }
+
+    private Player _Player;
+    private Player player
+    {
+        get
+        {
+            if(_Player == null)
+            {
+                _Player = GameObject.FindObjectOfType<Player>();
+            }
+            return _Player;
+        }
+    }
+
+    //UIが押された時に呼び出される処理。
+    public void OnClick()
+    {
+        //弾の発射。
+        player.Shot(_BulletInfo);
+        //
+        gameObject.SetActive(false);
+    }
 }

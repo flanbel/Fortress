@@ -70,4 +70,10 @@ public class Create : Editor
     {
         CreateScriptableObjectFromJSON(new BulletRecipeSO());
     }
+
+    [MenuItem("Assets/CreateScriptableObject/FortressParts")]
+    static void FortressParts()
+    {
+        CreateScriptableObjectFromJSON(new FortressPartsSO());
+    }
 }

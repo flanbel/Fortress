@@ -29,7 +29,7 @@ public class DisplayDamage : SingletonMonoBehaviour<DisplayDamage> {
             return;
         }
 
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 30; i++)
         {
             //生成。
             GameObject damageT = Instantiate(prefab, transform);
@@ -42,17 +42,18 @@ public class DisplayDamage : SingletonMonoBehaviour<DisplayDamage> {
     //[in] 表示するダメージ。
     //[in] 表示する場所の基点。
     //[in] タグ。
-    public void DisplayDamageText(int damage,Vector3 pos,string tag)
+    public void DisplayDamageText(int damage,Vector3 pos,Fortress fortress)
     {
         //非アクティブなテキストを取得。
         Text text = _TextList.Find((a) => a.gameObject.activeSelf == false);
         text.gameObject.SetActive(true);
-        //タグ設定。
-        text.tag = tag;
         //少しずらす。
         int range = 100;
         text.transform.position = pos + new Vector3(Random.Range(-range, range), Random.Range(-range, range));
         //ダメージ設定。
         text.text = damage.ToString();
+
+        //
+        text.gameObject.GetComponent<DamageText>().fortress = fortress;
     }
 }

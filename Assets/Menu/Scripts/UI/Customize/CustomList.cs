@@ -41,6 +41,8 @@ public class CustomList : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        _ItemNum = Data.bulletsDictionary.Length-1;
+
         //ページ数を切り上げ。
         _MaxPageNum = (int)Mathf.Ceil(_ItemNum / 8.0f);
         nowPage = 1;

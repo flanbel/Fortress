@@ -26,12 +26,21 @@ public class Fortress : MonoBehaviour {
         get { return Info.HP; }
         set
         {
-            Info.HP = value;
-            //テキスト変更。
-            _HPText.text = Info.HP.ToString();
-            //HPバー変更。
-            float rate = (float)HP / (float)Info.param.MaxHP;
-            _HPBar.fillAmount = rate;
+            if (Info.HP > 0)
+            {
+                Info.HP = value;
+                //テキスト変更。
+                _HPText.text = Info.HP.ToString();
+                //HPバー変更。
+                float rate = (float)HP / (float)Info.param.MaxHP;
+                _HPBar.fillAmount = rate;
+
+                //死んだ。
+                if (Info.HP <= 0)
+                {
+                    Collapse();
+                }
+            }
         }
     }
     
@@ -45,43 +54,31 @@ public class Fortress : MonoBehaviour {
     public int ammoLimitNum { get { return _AmmoLimitNum; } }
 
     //大砲。
-    private Cannon _Cannon;
-    private Cannon cannon
+    private Cannon _Cannon = null;
+    public Cannon cannon
     {
         get
         {
-            if(_Cannon == null)
+            if (_Cannon == null)
             {
-                //子にあるキャノン取得。
-                _Cannon = transform.GetComponentInChildren<Cannon>();
+                //子を取得。
+                GameObject obj = transform.Find("Cannon").gameObject;
+                //大砲を追加。
+                _Cannon = obj.AddComponent<StandardCannon>();
                 _Cannon.tag = tag;
             }
             return _Cannon;
         }
     }
 
-    private Firing[] _Firing;
-    private Firing[] firing
-    {
-        get
-        {
-            if (_Firing == null)
-            {
-                //子にあるキャノン取得。
-                _Firing = transform.GetComponentsInChildren<Firing>();
-            }
-            return _Firing;
-        }
-    }
-
-    private Text _HPText;
+    public Text _HPText;
     private Image _HPBar;
 
     // Use this for initialization
     void Start () {
         //体力テキスト検索。
-        _HPText = GameObject.Find(name + "HPText").GetComponent<Text>();
-        _HPBar = GameObject.Find(name + "HpBar").GetComponent<Image>();
+        _HPText = GameObject.Find(tag + "HPText").GetComponent<Text>();
+        _HPBar = GameObject.Find(tag + "HpBar").GetComponent<Image>();
         HP = Info.param.MaxHP;
     }
 
@@ -92,29 +89,26 @@ public class Fortress : MonoBehaviour {
     {
         BulletInfo info = Data.GetBulletInfo(id);
         //限界数未満か？
-        bool ret = (_Armory.Count < _AmmoLimitNum);
+        bool ret = (armory.Count < _AmmoLimitNum);
 
         if ((info != null) && ret)
         {
             //内部弾薬を補給。
-            _Armory.Add(id);
+            armory.Add(id);
 
             //UI設定。
-            if (tag == "Player")
-                GameBulletsManager.Instance.DisplayBulletUI(info);
+            if (tag == "Player") GameBulletsManager.Instance.DisplayBulletUI(info);
         }
         return ret;
     }
 
     //弾を発射。
-    public void Shot(int idx,BulletInfo info)
+    public void Shot(BulletInfo info,Vector2 vec)
     {
-        //弾薬を消費。
-        _Armory.Remove(info.ID);
-
-        idx = Mathf.Min(idx, firing.Length - 1);
         //発射。
-        cannon.Shot(firing[idx], info);
+        cannon.Shot(info, vec * (info.Speed / 5.0f));
+        //弾薬を消費。
+        armory.Remove(info.ID);
     }
 
     //ダメージを適用。
@@ -137,20 +131,9 @@ public class Fortress : MonoBehaviour {
             yield return new WaitForEndOfFrame();
         }
     }
-
-    //当たり判定。
-    private void OnTriggerEnter2D(Collider2D collision)
+    //崩壊。
+    private void Collapse()
     {
-        //異なるタグと衝突した。
-        if (tag != collision.gameObject.tag)
-        {
-            Bullet bullet;
-            if (bullet = collision.gameObject.GetComponent<Bullet>())
-            {
-                int damage = bullet.bulletInfo.Power;
-                //ダメージのテキストを作成。
-                DisplayDamage.Instance.DisplayDamageText(damage, bullet.transform.position, tag);
-            }
-        }
+        BattleManager.Instance.GameOver();
     }
 }

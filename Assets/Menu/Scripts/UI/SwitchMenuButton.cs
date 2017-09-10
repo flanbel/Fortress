@@ -18,8 +18,9 @@ public class SwitchMenuButton : MonoBehaviour {
 
     //キャンバスの切り替えを行う。
     //[in] 切り替えたいキャンバス。
-    public void Switch(Menu menu)
+    public void Switch()
     {
-        MenuManager.Instance.Switch(menu);
+        if (_Menu)
+            MenuManager.Instance.Switch(_Menu);
     }
 }

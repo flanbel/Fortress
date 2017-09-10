@@ -75,7 +75,7 @@ public class DragObject : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         dragObject.SetActive(true);
         //情報をコピー。
         _DragImage.sprite = sourceImage.sprite;
-        _DragImage.rectTransform.sizeDelta = sourceImage.rectTransform.sizeDelta;
+        _DragImage.rectTransform.sizeDelta = sourceImage.rectTransform.rect.size;
         _DragImage.color = sourceImage.color;
         _DragImage.material = sourceImage.material;
 

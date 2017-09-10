@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //ゲームシーンで発射する弾丸。
+[RequireComponent(typeof(Rigidbody2D))]
 public class Bullet : MonoBehaviour {
 
     SpriteRenderer _Sprite;
@@ -31,12 +32,40 @@ public class Bullet : MonoBehaviour {
             sprite.sprite = _BulletInfo.Texture;
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    Rigidbody2D _Rigid;
+
+    private void Start()
+    {
+        _Rigid = GetComponent<Rigidbody2D>();        
+    }
+
+    private void OnEnable()
+    {
+        sprite.sortingOrder = 1;
+        Invoke("SetOrder", 2.0f);
+    }
+
+    // Update is called once per frame
+    void Update () {
         //範囲外チェック。
         CheckLimit();
-        transform.Rotate(new Vector3(0, 0, 1));
+
+        if (_BulletInfo.Straight)
+        {
+            Vector3 vec = _Rigid.velocity.normalized * transform.localScale.x;
+            transform.eulerAngles = new Vector3(0, 0, Mathf.Rad2Deg * Mathf.Atan2(vec.x, -vec.y) - 90);
+        }
+        else
+        {
+            transform.Rotate(new Vector3(0, 0, -1 * transform.localScale.x));
+        }
+    }
+
+    //
+    private void SetOrder()
+    {
+        sprite.sortingOrder = 100;
     }
 
     //耐久値の減算。
@@ -54,23 +83,50 @@ public class Bullet : MonoBehaviour {
     {
         GameObject bom = GameBulletsManager.Instance.Explosion();
         bom.transform.position = transform.position;
+
         gameObject.SetActive(false);
     }
 
     //範囲外に出た。
     private void CheckLimit()
     {
-        if (transform.position.x > 1960 ||
+        // 画面右上のワールド座標をビューポートから取得
+        Vector2 size = Camera.main.ViewportToWorldPoint(new Vector2(1, 1));
+
+        if (transform.position.x > size.x ||
             transform.position.y < -10)
             gameObject.SetActive(false);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        //異なるタグと衝突した。
-        if (tag != collision.gameObject.tag)
+        //相手の弾丸と衝突した。
+        Bullet bullet;
+        if (bullet = collision.gameObject.GetComponent<Bullet>())
         {
             SubEndurance(1);
+
+            //else
+            //{
+            //    //反射。
+            //    tag = tag.Contains("Player") ? "EnemyBullet" : "PlayerBullet";
+
+            //    transform.localScale = -transform.localScale;
+            //}
+        }
+        else
+        {
+            SubEndurance(999);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //相手の城と衝突した。
+        string Tag = tag.Replace("Bullet", "");
+        if (!collision.gameObject.tag.Contains(Tag))
+        {
+            _Break();   
         }
     }
 }

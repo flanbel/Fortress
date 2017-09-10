@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Text))]
 public class DamageText : MonoBehaviour {
 
     private Animator _Animator;
@@ -18,12 +19,15 @@ public class DamageText : MonoBehaviour {
             return _Animator;
         }
     }
-    Text _Text;
+    //テキスト。
+    private Text _Text;
+    //アニメーションが終了したか？
     private bool _EndAnim = false;
+    //要塞への参照。
+    public Fortress fortress;
 
     private void Start()
     {
-        
         _Text = GetComponent<Text>();
     }
 
@@ -52,16 +56,14 @@ public class DamageText : MonoBehaviour {
     //要塞にダメージ適用。
     private void ApplyDamage()
     {
-        //要塞検索。
-        GameObject.Find(tag).GetComponent<Fortress>().ApplyDamage(Convert.ToInt16(_Text.text));
+        fortress.ApplyDamage(Convert.ToInt16(_Text.text));
     }
 
     private IEnumerator Move()
     {
         float timer = 0.0f;
         Vector3 startPos = transform.position;
-        GameObject _Target = GameObject.Find(tag + "HPText");
-        Vector3 targetPos = _Target.transform.position;
+        Vector3 targetPos = fortress._HPText.transform.position;
 
         do
         {

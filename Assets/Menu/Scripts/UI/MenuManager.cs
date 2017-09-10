@@ -112,8 +112,15 @@ public class MenuManager : SingletonMonoBehaviour<MenuManager>
             if (_NowMenu) nowR.anchoredPosition = Vector3.Lerp(Vector3.zero, new Vector3(-dir * width, 0), timer);
             nextR.anchoredPosition = Vector3.Lerp(new Vector3(dir * width, 0), Vector3.zero, timer);
             //タイトルの移動。
-            _TitleUI.anchoredPosition = Vector3.Lerp(new Vector3(-_TitleUI.sizeDelta.x, UIPosY), new Vector3(0, UIPosY), timer);
-
+            if(timer <= 0.5f)
+            {
+                _TitleUI.anchoredPosition = Vector3.Lerp(new Vector3(0, UIPosY), new Vector3(-_TitleUI.sizeDelta.x, UIPosY), timer * 2);
+            }
+            else
+            {
+                _TitleUI.anchoredPosition = Vector3.Lerp(new Vector3(-_TitleUI.sizeDelta.x, UIPosY), new Vector3(0, UIPosY), timer);
+            }
+            //
             yield return new WaitForEndOfFrame();
         } while (timer < 1.0f);
     }

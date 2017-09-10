@@ -86,7 +86,7 @@ public class BulletItem : MonoBehaviour , IPointerEnterHandler, IPointerExitHand
     private void StockCheck()
     {
         //選択不可。
-        button.interactable = drag.enabled = !(GetBulletStock(_BulletInfo.ID) == 0);
+        //button.interactable = drag.enabled = !(GetBulletStock(_BulletInfo.ID) == 0);
     }
 
     //弾数を可視化するテキストに設定。
